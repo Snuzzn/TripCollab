@@ -1,3 +1,8 @@
+from service.activity_help import activity_help
+from service.group_plan import group, schedule, group_activities
+from service.user_management import user
+from config.exception import ValueError, AccessError, default_handler
+from utils import place
 import sys
 import re
 import os
@@ -9,11 +14,6 @@ from flask_cors import CORS
 from flask_restx import Api
 from os.path import dirname, join, abspath
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
-from utils import place
-from config.exception import ValueError, AccessError, default_handler
-from service.user_management import user
-from service.group_plan import group, schedule, group_activities
-from service.activity_help import activity_help
 
 ''' Backend Flask Server '''
 
@@ -23,6 +23,7 @@ app.register_error_handler(Exception, default_handler)
 CORS(app)
 api = Api(app)
 
+
 @app.route('/login', methods=['POST'])
 def login():
     ''' user login '''
@@ -31,6 +32,7 @@ def login():
     user_email = body['email']
     user.login(user_email, access_token)
     return dumps({})
+
 
 @app.route('/group', methods=['POST'])
 def create_group():
@@ -50,11 +52,13 @@ def create_group():
     group.create_group(group_name, leader_token, trip_date, location)
     return dumps({})
 
+
 @app.route('/location', methods=['GET'])
 def get_group_location():
     ''' get group trip location '''
     group_id = request.values.get('group_id')
     return dumps(group.get_location(group_id))
+
 
 @app.route('/activities/<group_id>', methods=['GET'])
 def list_activities(group_id):
@@ -62,11 +66,13 @@ def list_activities(group_id):
     nominations = group_activities.get_nominations(group_id)
     return dumps(nominations)
 
+
 @app.route('/search', methods=['GET'])
 def search():
     ''' search location by name '''
     activity_name = request.values.get('activity')
     return dumps(activity_help.get_activity_details(activity_name))
+
 
 @app.route('/activities/nominate', methods=['POST'])
 def nominate():
@@ -78,8 +84,10 @@ def nominate():
     rating = body['rating']
     photo_reference = body['photo_reference']
     category = body['category']
-    group_activities.nominate(group_id, google_places_id, activity_name, rating, photo_reference, category)
+    group_activities.nominate(
+        group_id, google_places_id, activity_name, rating, photo_reference, category)
     return dumps({})
+
 
 @app.route('/activities/vote', methods=['POST'])
 def vote():
@@ -90,6 +98,7 @@ def vote():
     group_activities.vote(activity_id, access_token)
     return dumps({})
 
+
 @app.route('/activities/vote', methods=['DELETE'])
 def unvote():
     ''' undo vote '''
@@ -98,11 +107,13 @@ def unvote():
     group_activities.unvote(activity_id, access_token)
     return dumps({})
 
+
 @app.route('/poll/<group_id>', methods=['GET'])
 def get_poll_result(group_id):
     ''' get poll result '''
     poll_result = group_activities.get_poll(group_id)
     return dumps(poll_result)
+
 
 @app.route('/activities/suggest', methods=['GET'])
 def suggest_activities():
@@ -122,13 +133,16 @@ def suggest_activities():
         'picnic': picnic,
         'cultural': cultural
     }
-    suggestions = activity_help.suggest_activities_by_categories(questionairre, location)
+    suggestions = activity_help.suggest_activities_by_categories(
+        questionairre, location)
     return dumps(suggestions)
 
+
 @app.route('/side-activities/<group_id>', methods=['GET'])
-def suggest_side_activities(group_id):    
+def suggest_side_activities(group_id):
     ''' suggest side activities '''
     return dumps(activity_help.suggest_side_activities(group_id))
+
 
 @app.route('/side-activities', methods=['POST'])
 def add_side_activity():
@@ -141,9 +155,11 @@ def add_side_activity():
     rating = body['rating']
     photo_reference = body['photo_reference']
     category = body['category']
-    activity_id = group_activities.add_side_activity(authoriser_token, group_id, google_places_id, activity_name, rating, photo_reference, category)
+    activity_id = group_activities.add_side_activity(
+        authoriser_token, group_id, google_places_id, activity_name, rating, photo_reference, category)
     schedule.add_schedule(group_id, activity_id, authoriser_token)
     return dumps({})
+
 
 @app.route('/schedule', methods=['POST'])
 def add_schedule():
@@ -155,11 +171,13 @@ def add_schedule():
     schedule.add_schedule(group_id, int(activity_id), authoriser_token)
     return dumps({})
 
+
 @app.route('/schedule/<group_id>', methods=['GET'])
 def get_schedule(group_id):
     ''' get schedule '''
     output = schedule.get_schedule(group_id)
     return dumps(output)
+
 
 @app.route('/schedule', methods=['PUT'])
 def change_schedule():
@@ -170,8 +188,10 @@ def change_schedule():
     activity_id = body['activity_id']
     start_time = body['start_time']
     end_time = body['end_time']
-    schedule.change_schedule(group_id, int(activity_id), start_time, end_time, authoriser_token)
+    schedule.change_schedule(group_id, int(
+        activity_id), start_time, end_time, authoriser_token)
     return dumps({})
+
 
 @app.route('/schedule/<group_id>', methods=['DELETE'])
 def remove_schedule(group_id):
@@ -181,5 +201,6 @@ def remove_schedule(group_id):
     schedule.remove_schedule(group_id, activity_id, authoriser_token)
     return dumps({})
 
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(threaded=True, port=5000)
