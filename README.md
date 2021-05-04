@@ -12,15 +12,6 @@
 |  z5208105| Tingzhuang (Sam) Zhou  | 
 
 
-###  Collaboration Tools
-| Category     | Tool | 
-| :------------- | :----------: | 
-| Source control        | [GitHub](https://github.com/Snuzzn/SENG2011_Team-Mongoose)        | 
-| Meetings | [Microsoft Teams](https://teams.microsoft.com/l/channel/19%3a80b9ca9ee9bd4941b984907ef0c336f3%40thread.tacv2/General?groupId=5bd2e8e7-6db7-496a-8516-65f7f8038df1&tenantId=3ff6cfa4-e715-48db-b8e1-0867b9f9fba3)|
-|Discussions | Messenger|
-|Project Management| [Trello](https://trello.com/b/jLHxPiDO/project-board)|
-|Document sharing | [Google Doc](https://docs.google.com/document/d/11ml6Zbl5ZOISTuHi4Y6UhOVEK8MKHxR1xcX6CjaxgOQ/edit) |
-
 <br>
 
 ## How To Run
